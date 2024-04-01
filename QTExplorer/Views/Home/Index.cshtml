@@ -1,0 +1,79 @@
+﻿@{
+	Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Trang chủ</title>
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link href="~/lib/qtexplorer/css/qtexplorer.min.css" rel="stylesheet" asp-append-version="true" />
+</head>
+<body>
+
+	<div class="container">
+
+		<div x-data="qtexplorer" class="filemanager">
+			@*Thanh công cụ*@
+			<div class="fm-toolbox">
+				<button x-on:click="openFolderUpdinPopup()">➕</button>
+				<button style="background-color:red" x-on:click="deleteSelectedItem">❌</button>
+			</div>
+
+			@*Cây thư mục*@
+			<div class="fm-folder-tree">
+				<ul>
+					<li class="folder-level-0" x-on:click="getAllInDir('', -1)">
+						<span>This PC 💻</span>
+					</li>
+					<template x-for="(f, idx) in _folderTree">
+						<li :class="{...f.cssClass, selected: idx == _folderTreeSelectedIndex}" x-on:click="getAllInDir(f.fullPath, idx)">
+							<button class="btn-file" x-text="f.isOpen ? '📂' : '📁'"
+									x-on:click.stop="toggleFolder(idx)">
+								+
+							</button>
+							<span x-text="f.folderName"></span>
+						</li>
+					</template>
+				</ul>
+			</div>
+
+			@*Hiển thị file và thư mục*@
+			<div class="fm-main-panel">
+				<template x-for="(f, idx) in _panelData">
+					<div class="panel-item" :class="{selected: _panelItemSelectedIndex == idx}" x-on:click="setSelectedItem(f, idx)">
+						<img :src="getIcon(f.isFolder)" />
+						<span x-text="f.name"></span>
+					</div>
+				</template>
+			</div>
+
+			@*Thông tin bổ sung*@
+			<div class="fm-additional-info">
+				<span x-text="_additionalInfo.selectedText"></span>
+			</div>
+
+			@*Popup cho phép thêm/sửa thông tin thư mục*@
+			<div class="fm-folder-updin-popup" :class="{show: _folderUpdinPopup.show}">
+				<div class="popup-main">
+					<div>
+						<label>Tên thư mục</label>
+						<input class="form-control" type="text" x-model="_folderUpdinPopup.value" />
+					</div> 
+					<div>
+						<button class="btn" x-on:click="updinFolder()">Lưu</button>
+						<button class="btn" x-on:click="closeFolderUpdinPopup()">Hủy</button>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+
+	<script defer src="~/lib/alpinejs/cdn.min.js"></script>
+	<script src="~/lib/qtexplorer/js/qtexplorer.js" asp-append-version="true"></script>
+</body>
+</html>
